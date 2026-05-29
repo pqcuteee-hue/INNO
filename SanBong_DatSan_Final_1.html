@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sân Bóng Đại Nam – Đặt Sân</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── CONFIG: DÁN URL APPS SCRIPT VÀO ĐÂY ────────────────
+   Sau khi deploy Apps Script, copy URL rồi thay vào dòng
+   APPS_SCRIPT_URL trong phần <script> cuối trang
+   ──────────────────────────────────────────────────────── */
+:root{
+  --grass:#1a6b2f;--grass-l:#2d8a42;--grass-p:#e8f5ec;
+  --pitch:#0d4a20;--gold:#f5a623;--gold-d:#c47d0e;
+  --red:#d63031;--night:#0a1628;--night2:#112040;
+  --ink:#1a1a2e;--muted:#6b7280;--border:#e5e7eb;
+  --surf:#f9fafb;--white:#ffffff;
+  --prime-bg:#fffbeb;--prime-bdr:#fcd34d;
+  --ov-bg:#fff1f2;--ov-bdr:#fca5a5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:#f3f4f6;color:var(--ink);min-height:100vh}
+.header{background:var(--pitch);color:var(--white)}
+.hpitch{height:6px;background:repeating-linear-gradient(90deg,var(--grass) 0 40px,var(--grass-l) 40px 80px)}
+.hinner{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:.5px;line-height:1.1}
+.logo span{color:var(--gold)}
+.logo small{display:block;font-size:11px;font-weight:400;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase}
+.hbadge{background:var(--gold);color:var(--pitch);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:4px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.steps{display:flex;background:var(--night2);padding:10px 20px;gap:0}
+.step{flex:1;display:flex;align-items:center;gap:7px;opacity:.45;transition:opacity .2s}
+.step.active{opacity:1}.step.done{opacity:.7}
+.snum{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step.active .snum{background:var(--gold);color:var(--pitch)}
+.step.done .snum{background:var(--grass-l)}
+.slbl{font-size:11px;color:#fff;font-weight:500;white-space:nowrap}
+.sarr{margin-left:auto;color:rgba(255,255,255,.3);font-size:12px}
+.content{padding:16px;max-width:480px;margin:0 auto}
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.chead{padding:13px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.csub{font-size:12px;color:var(--muted);margin-top:1px}
+.court-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px}
+.cbtn{border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf);position:relative}
+.cbtn.sel{border-color:var(--grass);background:var(--grass-p)}
+.cbi{font-size:24px;margin-bottom:4px}
+.cbn{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--ink)}
+.cbp{font-size:11px;color:var(--muted);margin-top:2px}
+.cbtn.sel .cbn{color:var(--grass)}
+.cbadge{position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:var(--grass);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center}
+.cbtn.sel .cbadge{display:flex}
+.date-row{display:flex;gap:8px;padding:0 16px 14px;align-items:center}
+.date-wrap{flex:1}
+.date-wrap input[type=date]{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--ink);background:var(--surf);outline:none;cursor:pointer}
+.date-wrap input[type=date]:focus{border-color:var(--grass)}
+.dbadge{background:var(--night);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:10px 14px;border-radius:10px;white-space:nowrap;letter-spacing:.5px;min-width:72px;text-align:center}
+.slots-wrap{padding:0 12px 12px}
+.slots-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:8px 4px 6px}
+.slot{display:flex;align-items:center;gap:10px;padding:10px;border:1.5px solid var(--border);border-radius:11px;margin-bottom:7px;cursor:pointer;transition:all .15s;background:var(--white);position:relative}
+.slot:hover{border-color:#9ca3af}
+.slot.prime{background:var(--prime-bg);border-color:var(--prime-bdr)}
+.slot.overlap{background:var(--ov-bg);border-color:var(--ov-bdr)}
+.slot.sel{border-color:var(--grass);background:var(--grass-p)}
+.slot.sel.prime{border-color:var(--grass)}
+.slot.conflict{border-color:var(--red);background:#fff1f2;pointer-events:none;opacity:.55}
+.slot.noservice{border-color:#d1d5db;background:#f9fafb;pointer-events:none;opacity:.45}
+.stime{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--ink);min-width:105px;line-height:1.2}
+.stime small{display:block;font-size:10px;font-weight:400;color:var(--muted);font-family:'Barlow',sans-serif;letter-spacing:.5px}
+.slot.prime .stime{color:var(--gold-d)}
+.sprice{margin-left:auto;text-align:right;font-size:13px;font-weight:600;color:var(--grass);white-space:nowrap}
+.sprice .per{font-size:10px;font-weight:400;color:var(--muted);display:block}
+.scheck{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:12px;color:transparent}
+.slot.sel .scheck{background:var(--grass);border-color:var(--grass);color:#fff}
+.sconflict{font-size:10px;color:var(--red);font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px 14px}
+.litem{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.form-row{padding:6px 16px}
+.form-row label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.form-row input,.form-row select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--ink);background:var(--surf);outline:none;transition:border .15s}
+.form-row input:focus,.form-row select:focus{border-color:var(--grass);background:#fff}
+.f2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:6px 16px}
+.f2col label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.f2col input,.f2col select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--ink);background:var(--surf);outline:none}
+.f2col input:focus,.f2col select:focus{border-color:var(--grass);background:#fff}
+.sum-card{background:var(--night);border-radius:14px;overflow:hidden;margin-bottom:14px;color:#fff}
+.shead{padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.1);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gold)}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}
+.srow:last-child{border-bottom:none}
+.srow .sk{color:rgba(255,255,255,.65)}
+.srow .sv{font-weight:600;color:#fff}
+.srow .sv.gold{color:var(--gold);font-size:20px;font-family:'Barlow Condensed',sans-serif;font-weight:700}
+.srow .sv.sm{font-size:12px;color:rgba(255,255,255,.5)}
+.sslot{padding:8px 16px;display:flex;justify-content:space-between;font-size:12px;border-bottom:1px dashed rgba(255,255,255,.08)}
+.sslot .st{color:rgba(255,255,255,.8)}
+.sslot .sp{color:var(--gold);font-weight:600}
+.cta-wrap{padding:4px 0 24px}
+.cta{width:100%;background:var(--grass);color:#fff;border:none;border-radius:13px;padding:16px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .15s;text-transform:uppercase}
+.cta:hover{background:var(--grass-l)}
+.cta:active{transform:scale(.98)}
+.cta:disabled{background:#d1d5db;cursor:not-allowed;transform:none}
+.cta .csub{display:block;font-size:11px;font-weight:400;opacity:.85;margin-top:2px;font-family:'Barlow',sans-serif;letter-spacing:0;text-transform:none}
+.dep-note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.5;margin:0 0 14px}
+.dep-note strong{font-weight:600}
+/* Loading overlay */
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,22,40,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.overlay.show{display:flex}
+.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay p{color:#fff;font-size:14px;font-family:'Barlow',sans-serif}
+/* Success */
+.success{display:none;padding:32px 16px;text-align:center;max-width:480px;margin:0 auto}
+.sico{width:72px;height:72px;background:var(--grass-p);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px}
+.stitle{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--grass);margin-bottom:6px}
+.ssub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.bcode{background:var(--night);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:4px;padding:14px 24px;border-radius:12px;margin-bottom:24px;display:inline-block}
+.rbtn{background:transparent;border:1.5px solid var(--grass);color:var(--grass);border-radius:12px;padding:12px 28px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+.rbtn:hover{background:var(--grass-p)}
+/* Error toast */
+.toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:200;max-width:320px;text-align:center;border-left:3px solid var(--red)}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <p>Đang gửi đặt sân...</p>
+</div>
+
+<!-- Toast error -->
+<div class="toast" id="toast"></div>
+
+<header class="header">
+  <div class="hpitch"></div>
+  <div class="hinner">
+    <div class="logo">Sân Bóng <span>Đại Nam</span><small>Quận 12 · TP.HCM</small></div>
+    <div class="hbadge">Đặt Sân Online</div>
+  </div>
+  <div class="steps">
+    <div class="step active" id="s1"><div class="snum">1</div><div class="slbl">Chọn sân</div><div class="sarr">›</div></div>
+    <div class="step" id="s2"><div class="snum">2</div><div class="slbl">Thông tin</div><div class="sarr">›</div></div>
+    <div class="step" id="s3"><div class="snum">3</div><div class="slbl">Xác nhận</div></div>
+  </div>
+</header>
+
+<div id="mainForm">
+<div class="content">
+
+  <!-- Loại sân + ngày -->
+  <div class="card">
+    <div class="chead"><div><div class="ctitle">Loại Sân</div><div class="csub">Chọn sân 5 người hoặc sân 7 người</div></div></div>
+    <div class="court-types">
+      <div class="cbtn" id="btn_s5" onclick="selCourt('s5')">
+        <div class="cbadge">✓</div>
+        <div class="cbi">⚽</div><div class="cbn">Sân 5</div><div class="cbp">300–450k/ca</div>
+      </div>
+      <div class="cbtn" id="btn_s7a" onclick="selCourt('s7a')">
+        <div class="cbadge">✓</div>
+        <div class="cbi">🏟</div><div class="cbn">Sân 7A</div><div class="cbp">1,200–1,400k/ca</div>
+      </div>
+      <div class="cbtn" id="btn_s7b" onclick="selCourt('s7b')">
+        <div class="cbadge">✓</div>
+        <div class="cbi">🏟</div><div class="cbn">Sân 7B</div><div class="cbp">1,200–1,400k/ca</div>
+      </div>
+    </div>
+    <div class="date-row">
+      <div class="date-wrap"><input type="date" id="dateInput" onchange="updDay()"></div>
+      <div class="dbadge" id="dayBadge">—</div>
+    </div>
+  </div>
+
+  <!-- Khung giờ -->
+  <div class="card">
+    <div class="chead">
+      <div><div class="ctitle">Khung Giờ</div><div class="csub">Chọn 1 hoặc nhiều ca</div></div>
+      <div style="font-size:12px;color:var(--muted)" id="selCount">0 ca</div>
+    </div>
+    <div class="legend">
+      <div class="litem"><div class="ldot" style="background:#f5a623"></div>Giờ vàng ★</div>
+      <div class="litem"><div class="ldot" style="background:#fca5a5"></div>Chồng giờ ↔</div>
+      <div class="litem"><div class="ldot" style="background:#1a6b2f"></div>Đã chọn</div>
+    </div>
+    <div class="slots-wrap" id="slotsWrap"></div>
+  </div>
+
+  <!-- Thông tin khách -->
+  <div class="card">
+    <div class="chead"><div class="ctitle">Thông Tin Liên Hệ</div></div>
+    <div style="height:10px"></div>
+    <div class="form-row">
+      <label>Tên đội / Người đặt *</label>
+      <input type="text" id="cusName" placeholder="VD: Đội FC Thắng Lợi">
+    </div>
+    <div class="f2col">
+      <div>
+        <label>Số điện thoại *</label>
+        <input type="tel" id="cusPhone" placeholder="0909 xxx xxx">
+      </div>
+      <div>
+        <label>Số người</label>
+        <select id="cusPlayers">
+          <option>5–6 người</option><option>7–8 người</option>
+          <option>9–10 người</option><option>10–12 người</option><option>12–14 người</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="padding-bottom:14px">
+      <label>Ghi chú</label>
+      <input type="text" id="cusNote" placeholder="VD: Cần dọn sân trước 15 phút...">
+    </div>
+  </div>
+
+  <!-- Tổng kết -->
+  <div class="sum-card" id="sumCard" style="display:none">
+    <div class="shead">Tổng Kết Đặt Sân</div>
+    <div id="sumSlots"></div>
+    <div class="srow"><span class="sk">Loại sân</span><span class="sv" id="sumType">—</span></div>
+    <div class="srow"><span class="sk">Ngày đá</span><span class="sv" id="sumDate">—</span></div>
+    <div class="srow"><span class="sk">Tổng ca</span><span class="sv" id="sumN">—</span></div>
+    <div class="srow"><span class="sk">Tổng tiền</span><span class="sv gold" id="sumTotal">0đ</span></div>
+    <div class="srow"><span class="sk">Đặt cọc 50%</span><span class="sv" id="sumDep" style="color:var(--gold)">0đ</span></div>
+    <div class="srow"><span class="sk sm">Mã đặt sân</span><span class="sv sm" id="sumCode">—</span></div>
+  </div>
+
+  <div class="dep-note" id="depNote" style="display:none">
+    <strong>Thanh toán:</strong> Chuyển khoản đặt cọc <strong id="depAmt"></strong> trước 2 giờ để giữ sân.
+    Số dư thanh toán khi đến.
+  </div>
+
+  <div class="cta-wrap">
+    <button class="cta" id="ctaBtn" onclick="handleCTA()" disabled>
+      Tiếp tục
+      <span class="csub" id="ctaSub">Chọn loại sân và khung giờ</span>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- Success -->
+<div class="success" id="successScr">
+  <div class="sico">✓</div>
+  <div class="stitle">Đặt Sân Thành Công!</div>
+  <div class="ssub" id="successMsg"></div>
+  <div class="bcode" id="bCode">DN-0000</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Liên hệ: <strong style="color:var(--ink)">SĐT sân</strong></div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:28px">Địa chỉ: <strong style="color:var(--ink)">Cụm sân Đại Nam, Quận 12</strong></div>
+  <button class="rbtn" onclick="resetAll()">Đặt Sân Khác</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ⚙️  CẤU HÌNH – DÁN URL APPS SCRIPT CỦA BẠN VÀO ĐÂY
+// ═══════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybmTVyA5frUIYy8cCwf2lT3xziarBjWkPYVcON0UbIwDflwiLUGZu6I00YtTqZxp59/exec';
+// ═══════════════════════════════════════════════════════════
+
+const DAYS_VI = ['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+
+const COURTS = { s5:'Sân 5', s7a:'Sân 7A', s7b:'Sân 7B' };
+
+const KHUNGS = [
+  {id:'k1', t:'06:00–07:30', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k2', t:'07:00–08:30', lbl:'',    prime:false, ov:'k3',  p5:300000, p7:0       },
+  {id:'k3', t:'07:30–09:00', lbl:'↔',   prime:false, ov:'k2',  p5:300000, p7:0       },
+  {id:'k4', t:'08:30–10:00', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k5', t:'10:00–11:30', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k6', t:'11:30–13:00', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k7', t:'13:00–14:30', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k8', t:'14:30–16:00', lbl:'',    prime:false, ov:null,  p5:300000, p7:0       },
+  {id:'k9', t:'17:00–18:30', lbl:'↔',   prime:false, ov:'k10', p5:400000, p7:1400000 },
+  {id:'k10',t:'17:30–19:00', lbl:'★',   prime:true,  ov:'k9',  p5:400000, p7:1400000 },
+  {id:'k11',t:'19:00–20:30', lbl:'★',   prime:true,  ov:'k12', p5:450000, p7:1400000 },
+  {id:'k12',t:'19:30–21:00', lbl:'★↔',  prime:true,  ov:'k11', p5:450000, p7:1400000 },
+  {id:'k13',t:'20:30–22:00', lbl:'★',   prime:true,  ov:null,  p5:400000, p7:1200000 },
+  {id:'k14',t:'22:00–23:30', lbl:'',    prime:false, ov:null,  p5:300000, p7:1200000 },
+];
+
+let st = { court:null, date:null, sel:new Set(), step:1 };
+let bookingCode = '';
+
+// ── INIT ────────────────────────────────────────────────────
+(function init() {
+  const d=new Date(), y=d.getFullYear(),
+        m=String(d.getMonth()+1).padStart(2,'0'),
+        dd=String(d.getDate()).padStart(2,'0');
+  document.getElementById('dateInput').value=`${y}-${m}-${dd}`;
+  updDay(); renderSlots();
+})();
+
+function updDay() {
+  const v=document.getElementById('dateInput').value;
+  if(!v)return;
+  st.date=v;
+  const d=new Date(v+'T00:00:00');
+  document.getElementById('dayBadge').textContent=DAYS_VI[d.getDay()];
+}
+
+function selCourt(t) {
+  st.court=t; st.sel.clear();
+  ['s5','s7a','s7b'].forEach(x=>document.getElementById('btn_'+x).classList.toggle('sel',x===t));
+  renderSlots(); updCTA();
+}
+
+// ── SLOTS ───────────────────────────────────────────────────
+function renderSlots() {
+  const w=document.getElementById('slotsWrap');
+  w.innerHTML='';
+  const isS7 = st.court && st.court!=='s5';
+  KHUNGS.forEach(k=>{
+    const price  = isS7 ? k.p7 : k.p5;
+    const noSvc  = isS7 && k.p7===0;
+    const isSel  = st.sel.has(k.id);
+    const pvSel  = k.ov && st.sel.has(k.ov) && !isSel;
+    let cls='slot';
+    if(k.prime) cls+=' prime';
+    if(k.lbl&&k.lbl.includes('↔')) cls+=' overlap';
+    if(isSel) cls+=' sel';
+    if(pvSel) cls+=' conflict';
+    if(noSvc) cls+=' noservice';
+    const conflict_lbl = pvSel?'Xung đột ↔':noSvc?'Không có S7':'';
+    w.innerHTML+=`
+    <div class="${cls}" id="sl_${k.id}" onclick="togSlot('${k.id}')">
+      <div class="scheck">${isSel?'✓':''}</div>
+      <div class="stime">${k.t}<small>${k.lbl||(k.prime?'Giờ vàng':'')}</small></div>
+      ${conflict_lbl?`<div class="sconflict">${conflict_lbl}</div>`:'<div></div>'}
+      <div class="sprice">${price?fmt(price)+'đ':'—'}<span class="per">${price?'/ ca':''}</span></div>
+    </div>`;
+  });
+  document.getElementById('selCount').textContent=st.sel.size+' ca';
+}
+
+function togSlot(id) {
+  if(!st.court){showToast('Vui lòng chọn loại sân trước!');return;}
+  const k=KHUNGS.find(x=>x.id===id);
+  if(st.court!=='s5'&&k.p7===0)return;
+  if(!st.sel.has(id)&&k.ov&&st.sel.has(k.ov))return;
+  st.sel.has(id)?st.sel.delete(id):st.sel.add(id);
+  renderSlots(); updCTA(); updSummary();
+}
+
+// ── CTA ─────────────────────────────────────────────────────
+function handleCTA() {
+  if(st.step===1) {
+    if(!st.court||st.sel.size===0)return;
+    st.step=2;
+    document.getElementById('sumCard').style.display='block';
+    document.getElementById('depNote').style.display='block';
+    updSummary(); updSteps(); updCTA();
+    document.getElementById('cusName').scrollIntoView({behavior:'smooth',block:'start'});
+  } else {
+    doSubmit();
+  }
+}
+
+function updCTA() {
+  const btn=document.getElementById('ctaBtn');
+  const total=calcTotal();
+  const n=st.sel.size;
+  if(st.step===1){
+    const ok=st.court&&n>0;
+    btn.disabled=!ok;
+    btn.innerHTML=ok
+      ?`Tiếp tục → Điền Thông Tin<span class="csub">${n} ca · ${fmt(total)}đ</span>`
+      :`Tiếp tục<span class="csub">Chọn loại sân và ít nhất 1 khung giờ</span>`;
+  } else {
+    btn.disabled=false;
+    btn.innerHTML=`Xác Nhận & Gửi Đặt Sân<span class="csub">${n} ca · ${fmt(total)}đ · Cọc ${fmt(Math.round(total/2))}đ</span>`;
+  }
+}
+
+function calcTotal() {
+  const isS7=st.court&&st.court!=='s5';
+  let t=0;
+  st.sel.forEach(id=>{const k=KHUNGS.find(x=>x.id===id);if(k)t+=isS7?k.p7:k.p5;});
+  return t;
+}
+
+// ── SUMMARY ─────────────────────────────────────────────────
+function updSummary() {
+  if(!st.sel.size)return;
+  const isS7=st.court!=='s5';
+  const total=calcTotal();
+  const dep=Math.round(total/2);
+  const d=st.date?new Date(st.date+'T00:00:00'):null;
+  const dateStr=d?`${DAYS_VI[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`:'—';
+  bookingCode='DN-'+Math.floor(1000+Math.random()*9000);
+  const sorted=[...st.sel].sort((a,b)=>KHUNGS.findIndex(x=>x.id===a)-KHUNGS.findIndex(x=>x.id===b));
+  let sh='';
+  sorted.forEach(id=>{const k=KHUNGS.find(x=>x.id===id);const p=isS7?k.p7:k.p5;sh+=`<div class="sslot"><span class="st">${k.t} ${k.lbl}</span><span class="sp">${fmt(p)}đ</span></div>`;});
+  document.getElementById('sumSlots').innerHTML=sh;
+  document.getElementById('sumType').textContent=COURTS[st.court]||'—';
+  document.getElementById('sumDate').textContent=dateStr;
+  document.getElementById('sumN').textContent=st.sel.size+' ca';
+  document.getElementById('sumTotal').textContent=fmt(total)+'đ';
+  document.getElementById('sumDep').textContent=fmt(dep)+'đ';
+  document.getElementById('sumCode').textContent=bookingCode;
+  document.getElementById('depAmt').textContent=fmt(dep)+'đ';
+}
+
+// ── SUBMIT → GOOGLE SHEETS ───────────────────────────────────
+async function doSubmit() {
+  const name =document.getElementById('cusName').value.trim();
+  const phone=document.getElementById('cusPhone').value.trim();
+  if(!name||!phone){showToast('Vui lòng điền đầy đủ tên và số điện thoại!');return;}
+  if(phone.replace(/\D/g,'').length<9){showToast('Số điện thoại không hợp lệ!');return;}
+
+  if(APPS_SCRIPT_URL==='THAY_BANG_URL_APPS_SCRIPT_CUA_BAN'){
+    // Demo mode – không có URL thật
+    showSuccess(name,phone);
+    return;
+  }
+
+  const isS7=st.court!=='s5';
+  const total=calcTotal();
+  const d=st.date?new Date(st.date+'T00:00:00'):new Date();
+  const sorted=[...st.sel].sort((a,b)=>KHUNGS.findIndex(x=>x.id===a)-KHUNGS.findIndex(x=>x.id===b));
+  const slotsStr=sorted.map(id=>KHUNGS.find(x=>x.id===id)?.t).join(' | ');
+
+  const payload={
+    code: bookingCode,
+    name, phone,
+    players: document.getElementById('cusPlayers').value,
+    courtType: COURTS[st.court],
+    date: `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`,
+    dayOfWeek: DAYS_VI[d.getDay()],
+    slots: slotsStr,
+    slotCount: st.sel.size,
+    total: fmt(total)+'đ',
+    deposit: fmt(Math.round(total/2))+'đ',
+    note: document.getElementById('cusNote').value.trim(),
+  };
+
+  document.getElementById('overlay').classList.add('show');
+
+  try {
+    const res=await fetch(APPS_SCRIPT_URL,{
+      method:'POST',
+      body: JSON.stringify(payload),
+    });
+    const json=await res.json();
+    document.getElementById('overlay').classList.remove('show');
+    if(json.ok){
+      showSuccess(name,phone);
+    } else {
+      showToast('Lỗi gửi đặt sân: '+json.error);
+    }
+  } catch(err) {
+    document.getElementById('overlay').classList.remove('show');
+    // Nếu CORS block thì thử no-cors (chỉ fire-and-forget)
+    try {
+      fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
+      showSuccess(name,phone); // Assume OK
+    } catch(e2){
+      showToast('Không kết nối được. Vui lòng gọi hotline đặt sân.');
+    }
+  }
+}
+
+function showSuccess(name,phone) {
+  const total=calcTotal();
+  const d=st.date?new Date(st.date+'T00:00:00'):new Date();
+  const dateStr=`${DAYS_VI[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  const sorted=[...st.sel].sort((a,b)=>KHUNGS.findIndex(x=>x.id===a)-KHUNGS.findIndex(x=>x.id===b));
+  const slotsStr=sorted.map(id=>KHUNGS.find(x=>x.id===id)?.t).join(', ');
+  document.getElementById('bCode').textContent=bookingCode;
+  document.getElementById('successMsg').innerHTML=
+    `<strong>${name}</strong> đã đặt <strong>${st.sel.size} ca ${COURTS[st.court]}</strong><br>
+    ${dateStr} · ${slotsStr}<br>Tổng: <strong>${fmt(total)}đ</strong> · Cọc: <strong>${fmt(Math.round(total/2))}đ</strong><br><br>
+    Xác nhận qua <strong>${phone}</strong> trong 15 phút.`;
+  document.getElementById('mainForm').style.display='none';
+  document.getElementById('successScr').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAll() {
+  st={court:null,date:null,sel:new Set(),step:1};
+  ['s5','s7a','s7b'].forEach(t=>document.getElementById('btn_'+t).classList.remove('sel'));
+  document.getElementById('sumCard').style.display='none';
+  document.getElementById('depNote').style.display='none';
+  document.getElementById('mainForm').style.display='block';
+  document.getElementById('successScr').style.display='none';
+  document.getElementById('cusName').value='';
+  document.getElementById('cusPhone').value='';
+  document.getElementById('cusNote').value='';
+  renderSlots(); updSteps();
+  const btn=document.getElementById('ctaBtn');
+  btn.innerHTML='Tiếp tục<span class="csub">Chọn loại sân và khung giờ</span>';
+  btn.disabled=true;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updSteps() {
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','done');
+    if(i+1===st.step) el.classList.add('active');
+    else if(i+1<st.step) el.classList.add('done');
+  });
+}
+
+function fmt(n){return new Intl.NumberFormat('vi-VN').format(Math.round(n))}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
