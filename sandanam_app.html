@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Sân Đại Nam — Quản Lý</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g: #16a34a;
+  --g2: #15803d;
+  --g3: #dcfce7;
+  --g4: #bbf7d0;
+  --b: #1d4ed8;
+  --b2: #dbeafe;
+  --r: #dc2626;
+  --r2: #fee2e2;
+  --a: #d97706;
+  --a2: #fef3c7;
+  --dk: #0f172a;
+  --dk2: #1e293b;
+  --dk3: #334155;
+  --mid: #64748b;
+  --lt: #f1f5f9;
+  --lt2: #e2e8f0;
+  --wh: #ffffff;
+  --radius: 14px;
+  --radius-sm: 8px;
+  font-family: 'Barlow', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#f8fafc;color:var(--dk);min-height:100vh;overscroll-behavior:none}
+.app{max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--wh)}
+
+/* ── HEADER ── */
+.header{background:var(--dk);padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-icon{width:32px;height:32px;background:var(--g);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;color:var(--wh);letter-spacing:.5px}
+.brand-sub{font-size:10px;color:#94a3b8;font-weight:500;letter-spacing:.3px}
+.date-badge{background:var(--dk3);border-radius:8px;padding:6px 10px;text-align:right}
+.date-txt{font-size:11px;color:#94a3b8;font-weight:500}
+.date-val{font-size:13px;color:var(--wh);font-weight:700}
+
+/* ── NAV TABS ── */
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 16px 12px;background:var(--dk)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:10px;border:none;background:transparent;color:#64748b;cursor:pointer;transition:all .15s;font-family:'Barlow',sans-serif}
+.nav-btn.active{background:var(--g);color:var(--wh)}
+.nav-btn svg{width:20px;height:20px;stroke-width:1.8}
+.nav-btn span{font-size:10px;font-weight:600;letter-spacing:.3px}
+
+/* ── CONTENT ── */
+.screen{display:none;flex:1;flex-direction:column;overflow-y:auto;padding-bottom:20px}
+.screen.active{display:flex}
+
+/* ── CARDS ── */
+.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.5px;color:var(--mid);text-transform:uppercase;padding:16px 16px 8px}
+.card{background:var(--wh);border:1px solid var(--lt2);border-radius:var(--radius);margin:0 12px 10px;overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--lt);background:var(--lt)}
+.card-header-title{font-weight:700;font-size:14px;color:var(--dk)}
+.card-body{padding:14px}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 12px 0}
+.kpi{background:var(--lt);border-radius:var(--radius-sm);padding:10px 10px 8px;text-align:center}
+.kpi-label{font-size:10px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:.4px}
+.kpi-val{font-size:18px;font-weight:800;color:var(--dk);margin-top:2px;font-family:'Barlow Condensed',sans-serif}
+.kpi-sub{font-size:10px;color:var(--mid);margin-top:1px}
+.kpi.green{background:var(--g3)}.kpi.green .kpi-val{color:var(--g2)}
+.kpi.blue{background:var(--b2)}.kpi.blue .kpi-val{color:var(--b)}
+.kpi.amber{background:var(--a2)}.kpi.amber .kpi-val{color:var(--a)}
+
+/* ── FORM ── */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 12px;border:1.5px solid var(--lt2);border-radius:var(--radius-sm);font-size:15px;font-family:'Barlow',sans-serif;color:var(--dk);background:var(--wh);transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--g)}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.form-textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 20px;border-radius:var(--radius-sm);border:none;font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;width:100%}
+.btn-primary{background:var(--g);color:var(--wh)}.btn-primary:active{background:var(--g2);transform:scale(.98)}
+.btn-secondary{background:var(--lt);color:var(--dk)}.btn-secondary:active{background:var(--lt2);transform:scale(.98)}
+.btn-danger{background:var(--r2);color:var(--r)}
+.btn-sm{padding:8px 14px;font-size:13px;width:auto;border-radius:6px}
+
+/* ── BOOKING GRID ── */
+.time-grid{display:flex;flex-direction:column;gap:6px;padding:0 12px}
+.time-row{background:var(--wh);border:1px solid var(--lt2);border-radius:10px;overflow:hidden}
+.time-row.peak{border-color:#fbbf24;background:#fffbeb}
+.time-row.overlap{border-color:#93c5fd;background:#eff6ff}
+.time-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--lt);border-bottom:1px solid var(--lt2)}
+.time-head.peak{background:#fef9c3;border-color:#fde68a}
+.time-label{font-weight:700;font-size:13px;color:var(--dk)}
+.time-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fef08a;color:#92400e}
+.time-price{font-size:11px;font-weight:600;color:var(--mid)}
+.san-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px 10px}
+.san-cell{display:flex;flex-direction:column;align-items:center;gap:3px}
+.san-label{font-size:9px;font-weight:700;color:var(--mid);text-transform:uppercase}
+.san-btn{width:100%;padding:6px 2px;border-radius:6px;border:1.5px solid var(--lt2);background:var(--wh);font-size:11px;font-weight:600;color:var(--dk3);cursor:pointer;text-align:center;transition:all .15s;min-height:32px;line-height:1.2}
+.san-btn.booked{background:var(--g3);border-color:var(--g);color:var(--g2)}
+.san-btn.pending{background:var(--a2);border-color:var(--a);color:var(--a)}
+.san-btn:active{transform:scale(.95)}
+
+/* ── CUSTOMER CARD ── */
+.kh-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--lt)}
+.kh-item:last-child{border-bottom:none}
+.kh-avatar{width:38px;height:38px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--g2);flex-shrink:0}
+.kh-info{flex:1;min-width:0}
+.kh-name{font-weight:700;font-size:14px;color:var(--dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kh-meta{font-size:12px;color:var(--mid);margin-top:1px}
+.kh-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-vip{background:#fef08a;color:#92400e}
+.badge-cd{background:var(--g3);color:var(--g2)}
+.badge-th{background:var(--lt2);color:var(--mid)}
+
+/* ── REPORT ── */
+.report-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--lt)}
+.report-row:last-child{border-bottom:none}
+.report-label{font-size:13px;color:var(--mid);font-weight:500}
+.report-val{font-size:14px;font-weight:700;color:var(--dk)}
+.report-val.green{color:var(--g2)}
+.report-val.red{color:var(--r)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dk);color:var(--wh);padding:11px 20px;border-radius:40px;font-size:14px;font-weight:600;z-index:999;transition:transform .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g2)}
+.toast.error{background:var(--r)}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end}
+.modal-overlay.open{display:flex}
+.modal{background:var(--wh);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--lt2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:var(--dk);margin-bottom:16px}
+
+/* ── STATUS BAR ── */
+.status-bar{background:var(--g);padding:6px 16px;display:flex;align-items:center;justify-content:space-between}
+.status-bar.offline{background:var(--r)}
+.status-txt{font-size:11px;font-weight:600;color:var(--wh)}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:10px}
+.spinner{width:28px;height:28px;border:3px solid var(--lt2);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px 20px;color:var(--mid)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.empty-text{font-size:14px;font-weight:500}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--lt);margin:8px 0}
+
+.num-input-row{display:grid;grid-template-columns:36px 1fr 36px;gap:6px;align-items:center}
+.num-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--lt2);background:var(--wh);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dk)}
+.num-btn:active{background:var(--lt)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="statusBar">
+  <span class="status-txt" id="statusTxt">● Đang kết nối...</span>
+  <span class="status-txt" id="statusTime"></span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-icon">⚽</div>
+      <div>
+        <div class="brand-name">Sân Đại Nam</div>
+        <div class="brand-sub">QUẢN LÝ VẬN HÀNH</div>
+      </div>
+    </div>
+    <div class="date-badge">
+      <div class="date-txt" id="dayLabel">HÔM NAY</div>
+      <div class="date-val" id="todayLabel">--/--</div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showScreen('home')" id="nav-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12L12 4l9 8v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/><path d="M9 21V12h6v9"/></svg>
+      <span>Tổng quan</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('booking')" id="nav-booking">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Đặt sân</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('payment')" id="nav-payment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>Thu tiền</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('report')" id="nav-report">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Báo cáo</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN: HOME ── -->
+<div class="screen active" id="screen-home">
+  <div class="kpi-strip">
+    <div class="kpi green">
+      <div class="kpi-label">Hôm nay</div>
+      <div class="kpi-val" id="kpi-dt">—</div>
+      <div class="kpi-sub">doanh thu (đ)</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Số ca</div>
+      <div class="kpi-val" id="kpi-ca">—</div>
+      <div class="kpi-sub">đã đặt</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Còn trống</div>
+      <div class="kpi-val" id="kpi-trong">—</div>
+      <div class="kpi-sub">ca hôm nay</div>
+    </div>
+  </div>
+
+  <div class="section-title">Đặt nhanh theo giờ</div>
+  <div class="time-grid" id="quickTimeGrid">
+    <div class="loading"><div class="spinner"></div><span style="font-size:13px;color:var(--mid)">Đang tải lịch...</span></div>
+  </div>
+
+  <div style="padding:8px 12px 0">
+    <button class="btn btn-primary" onclick="showScreen('booking')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Đặt sân mới
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN: BOOKING ── -->
+<div class="screen" id="screen-booking">
+  <div class="section-title">Đặt sân mới</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Khung giờ</label>
+          <select class="form-select" id="bk-khung">
+            <option value="">-- Chọn giờ --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sân số</label>
+          <select class="form-select" id="bk-san">
+            <option value="S1">Sân 1</option>
+            <option value="S2">Sân 2</option>
+            <option value="S3">Sân 3</option>
+            <option value="S4">Sân 4</option>
+            <option value="S5">Sân 5</option>
+            <option value="S7A">Sân 7A</option>
+            <option value="S7B">Sân 7B</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tên khách / Đội</label>
+        <input type="text" class="form-input" id="bk-kh" placeholder="Nhập tên hoặc chọn từ danh sách" list="kh-list" autocomplete="off">
+        <datalist id="kh-list"></datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tiền thu thực tế (đ)</label>
+        <div class="num-input-row">
+          <button class="num-btn" onclick="adjustMoney(-50000)">−</button>
+          <input type="number" class="form-input" id="bk-tien" placeholder="0" style="text-align:center" inputmode="numeric">
+          <button class="num-btn" onclick="adjustMoney(50000)">+</button>
+        </div>
+        <div style="font-size:11px;color:var(--mid);margin-top:4px">Giá tham khảo: <span id="bk-giaTK" style="font-weight:700;color:var(--g2)">—</span></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Loại ca</label>
+          <select class="form-select" id="bk-loai">
+            <option value="Lịch ngày">Lịch ngày</option>
+            <option value="Cố định">Cố định</option>
+            <option value="Giao hữu">Giao hữu</option>
+            <option value="Giải đấu">Giải đấu</option>
+            <option value="Online">Online</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">NV ghi nhận</label>
+          <input type="text" class="form-input" id="bk-nv" placeholder="Tên NV" value="">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ghi chú</label>
+        <input type="text" class="form-input" id="bk-ghichu" placeholder="Đá thêm giờ, trả sau, giải...">
+      </div>
+
+      <button class="btn btn-primary" onclick="submitBooking()" id="bk-submit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Xác nhận đặt sân
+      </button>
+    </div>
+  </div>
+
+  <div class="section-title">Lịch hôm nay</div>
+  <div class="time-grid" id="bookingTimeGrid">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ── SCREEN: PAYMENT ── -->
+<div class="screen" id="screen-payment">
+  <div class="section-title">Thu tiền ca</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ca làm</label>
+          <select class="form-select" id="py-ca">
+            <option value="Ca sáng">Ca sáng (6–14h)</option>
+            <option value="Ca chiều">Ca chiều (14–22h30)</option>
+            <option value="Ca tối">Ca tối (17–22h30)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">NV trực</label>
+          <input type="text" class="form-input" id="py-nv" placeholder="Tên NV">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tiền mặt thu (đ)</label>
+        <input type="number" class="form-input" id="py-tm" placeholder="0" inputmode="numeric" oninput="calcTotal()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chuyển khoản nhận (đ)</label>
+        <input type="number" class="form-input" id="py-ck" placeholder="0" inputmode="numeric" oninput="calcTotal()">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cọc nhận thêm (đ)</label>
+          <input type="number" class="form-input" id="py-coc" placeholder="0" inputmode="numeric" oninput="calcTotal()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hoàn / giảm (đ)</label>
+          <input type="number" class="form-input" id="py-hoan" placeholder="0" inputmode="numeric" oninput="calcTotal()">
+        </div>
+      </div>
+
+      <!-- Tong thuc thu -->
+      <div style="background:var(--g3);border-radius:10px;padding:12px 14px;margin:4px 0 14px">
+        <div style="font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.5px">Thực thu ca</div>
+        <div style="font-size:28px;font-weight:800;color:var(--g2);font-family:'Barlow Condensed',sans-serif" id="py-total">0 đ</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ghi chú / sự cố</label>
+        <textarea class="form-textarea" id="py-ghichu" placeholder="Sự cố, vắng sân, tranh cãi..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitPayment()" id="py-submit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Gửi báo cáo ca
+      </button>
+    </div>
+  </div>
+
+  <!-- Doi chieu nhanh -->
+  <div class="section-title">Đối chiếu nhanh hôm nay</div>
+  <div class="card">
+    <div class="card-body" id="doiChieuSection">
+      <div class="report-row">
+        <span class="report-label">Tổng các ca đã báo cáo</span>
+        <span class="report-val green" id="dc-tongca">— đ</span>
+      </div>
+      <div class="report-row">
+        <span class="report-label">Bank nhận hôm nay</span>
+        <input type="number" class="form-input" id="dc-bank" placeholder="Nhập từ app bank" inputmode="numeric" style="width:140px;text-align:right;padding:6px 10px;font-size:14px" oninput="calcDoiChieu()">
+      </div>
+      <div class="report-row">
+        <span class="report-label">Chênh lệch</span>
+        <span class="report-val" id="dc-chenh">—</span>
+      </div>
+      <div id="dc-status" style="text-align:center;padding:8px 0;font-weight:700;font-size:14px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN: REPORT ── -->
+<div class="screen" id="screen-report">
+  <div class="section-title">Báo cáo hôm nay</div>
+
+  <div class="kpi-strip">
+    <div class="kpi green">
+      <div class="kpi-label">Doanh thu</div>
+      <div class="kpi-val" id="rp-dt">—</div>
+      <div class="kpi-sub">đồng</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Tiền mặt</div>
+      <div class="kpi-val" id="rp-tm">—</div>
+      <div class="kpi-sub">đồng</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Chuyển khoản</div>
+      <div class="kpi-val" id="rp-ck">—</div>
+      <div class="kpi-sub">đồng</div>
+    </div>
+  </div>
+
+  <div class="section-title">Chi tiết thu tiền</div>
+  <div class="card">
+    <div class="card-body" id="reportDetail">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Khách hàng</div>
+  <div class="card" id="khachHangCard">
+    <div id="khachHangList">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+    <div style="padding:10px 14px">
+      <button class="btn btn-secondary" onclick="openAddKH()">+ Thêm khách mới</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: THÊM KHÁCH ── -->
+<div class="modal-overlay" id="modalKH">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Thêm khách hàng mới</div>
+    <div class="form-group">
+      <label class="form-label">Tên KH / Đội</label>
+      <input type="text" class="form-input" id="m-ten" placeholder="Tên đội hoặc tên cá nhân">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Số điện thoại</label>
+      <input type="tel" class="form-input" id="m-sdt" placeholder="09xxxxxxxx" inputmode="numeric">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Giờ hay đặt</label>
+        <input type="text" class="form-input" id="m-gio" placeholder="19:00★">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Loại</label>
+        <select class="form-select" id="m-loai">
+          <option>Thường</option>
+          <option>Cố định</option>
+          <option>VIP</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ghi chú</label>
+      <input type="text" class="form-input" id="m-ghichu" placeholder="Đặt T2+T5 hàng tuần...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" onclick="closeModal('modalKH')">Huỷ</button>
+      <button class="btn btn-primary" onclick="submitKH()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: CHI TIẾT SÂN ── -->
+<div class="modal-overlay" id="modalSanDetail">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalSanTitle">Đặt sân</div>
+    <div id="modalSanBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbyGOuN-JbaDJAezpo7CxaBfgk6xSqCIzWLsStSajalHKVNIEQD-KzrQMOgDnzvLYAQa/exec';
+
+// ── State ──────────────────────────────────────────────────────
+let state = {
+  giaSan: [],
+  lichSan: [],
+  khachHang: [],
+  baoCao: { rows:[], tong:{} },
+  today: '',
+  todayFormatted: '',
+  nv: localStorage.getItem('nv_name') || '',
+};
+
+// ── Init ──────────────────────────────────────────────────────
+(function init() {
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  state.today = `${dd}/${mm}/${yyyy}`;
+  state.todayFormatted = `${dd}/${mm}`;
+
+  const days = ['CN','T2','T3','T4','T5','T6','T7'];
+  document.getElementById('dayLabel').textContent = days[now.getDay()];
+  document.getElementById('todayLabel').textContent = state.todayFormatted;
+
+  if (state.nv) {
+    document.getElementById('bk-nv').value = state.nv;
+    document.getElementById('py-nv').value = state.nv;
+  }
+
+  loadAll();
+})();
+
+// ── API helpers ───────────────────────────────────────────────
+async function apiGet(params) {
+  const url = API + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  return res.json();
+}
+
+async function apiPost(data) {
+  const res = await fetch(API, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+// ── Load all data ─────────────────────────────────────────────
+async function loadAll() {
+  setStatus('loading');
+  try {
+    const [gia, lich, kh, bc] = await Promise.all([
+      apiGet({ action: 'getGiaSan' }),
+      apiGet({ action: 'getLichSan', date: state.today }),
+      apiGet({ action: 'getKhachHang' }),
+      apiGet({ action: 'getBaoCaoNgay', date: state.today }),
+    ]);
+
+    if (gia.ok)  { state.giaSan    = gia.giaSan || []; populateGioDropdown(); }
+    if (lich.ok) { state.lichSan   = lich.lichSan || []; }
+    if (kh.ok)   { state.khachHang = kh.khachHang || []; populateKHList(); }
+    if (bc.ok)   { state.baoCao    = bc; }
+
+    renderHome();
+    renderBookingGrid();
+    renderReport();
+    setStatus('ok');
+  } catch(e) {
+    setStatus('error');
+    showToast('Không kết nối được. Kiểm tra mạng.', 'error');
+  }
+}
+
+// ── Populate dropdowns ────────────────────────────────────────
+function populateGioDropdown() {
+  const sel = document.getElementById('bk-khung');
+  sel.innerHTML = '<option value="">-- Chọn giờ --</option>';
+  state.giaSan.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.khungGio;
+    opt.textContent = g.khungGio + (g.isVang ? ' ★' : '');
+    opt.dataset.giaS5 = g.giaS5;
+    opt.dataset.giaS7 = g.giaS7;
+    sel.appendChild(opt);
+  });
+  sel.onchange = function() {
+    const opt = sel.options[sel.selectedIndex];
+    const san = document.getElementById('bk-san').value;
+    const isS7 = san.includes('7');
+    const gia = isS7 ? (opt.dataset.giaS7||0) : (opt.dataset.giaS5||0);
+    document.getElementById('bk-giaTK').textContent = fmtMoney(gia);
+    if (!document.getElementById('bk-tien').value) {
+      document.getElementById('bk-tien').value = gia;
+    }
+  };
+  document.getElementById('bk-san').onchange = sel.onchange;
+}
+
+function populateKHList() {
+  const dl = document.getElementById('kh-list');
+  dl.innerHTML = '';
+  state.khachHang.forEach(k => {
+    if (!k.tenKH) return;
+    const opt = document.createElement('option');
+    opt.value = k.tenKH;
+    dl.appendChild(opt);
+  });
+}
+
+// ── Render Home ───────────────────────────────────────────────
+function renderHome() {
+  const tong = state.baoCao.tong || {};
+  const booked = state.lichSan.filter(r =>
+    [r.s1_tien,r.s2_tien,r.s3_tien,r.s4_tien,r.s5_tien].some(v => Number(v)>0)
+  ).length;
+  const total = state.giaSan.length || 15;
+  const trong = Math.max(0, total - booked);
+
+  document.getElementById('kpi-dt').textContent = fmtK(tong.tongThucThu || 0);
+  document.getElementById('kpi-ca').textContent = booked || '0';
+  document.getElementById('kpi-trong').textContent = trong;
+
+  // Quick time grid
+  const grid = document.getElementById('quickTimeGrid');
+  if (!state.giaSan.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Chưa tải được lịch</div></div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  const now = new Date();
+  const hhmm = now.getHours() * 60 + now.getMinutes();
+
+  state.giaSan.slice(0,10).forEach(g => {
+    const isPeak = g.isVang;
+    const isOverlap = g.khungGio.includes('*') || g.khungGio.includes('↔');
+    const row = document.createElement('div');
+    row.className = 'time-row' + (isPeak ? ' peak' : '') + (isOverlap ? ' overlap' : '');
+
+    const lichRow = state.lichSan.find(l => l.khungGio === g.khungGio) || {};
+    const soCaDat = [lichRow.s1_tien,lichRow.s2_tien,lichRow.s3_tien,lichRow.s4_tien,lichRow.s5_tien]
+      .filter(v => Number(v)>0).length;
+
+    row.innerHTML = `
+      <div class="time-head${isPeak?' peak':''}">
+        <div>
+          <span class="time-label">${g.khungGio.replace('★','').replace('↔','').trim()}</span>
+          ${isPeak ? '<span class="time-badge" style="margin-left:6px">★ Giờ vàng</span>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="time-price">${fmtMoney(g.giaS5)}</span>
+          <span style="font-size:11px;font-weight:700;color:${soCaDat>0?'var(--g2)':'var(--mid)'}">
+            ${soCaDat}/5 sân
+          </span>
+        </div>
+      </div>
+    `;
+
+    const sanRow = document.createElement('div');
+    sanRow.className = 'san-row';
+    ['S1','S2','S3','S4','S5'].forEach((s,i) => {
+      const keyKH = `s${i+1}_kh`;
+      const keyT = `s${i+1}_tien`;
+      const kh = lichRow[keyKH] || '';
+      const tien = Number(lichRow[keyT]) || 0;
+      const isBooked = tien > 0 || (kh && kh !== 'Có thể đặt');
+      const cell = document.createElement('div');
+      cell.className = 'san-cell';
+      cell.innerHTML = `
+        <span class="san-label">${s}</span>
+        <button class="san-btn${isBooked?' booked':''}" onclick="quickBook('${g.khungGio}','${s}','${kh}',${g.giaS5})">
+          ${isBooked ? (kh && kh!=='Có thể đặt' ? kh.substring(0,6) : '✓') : 'Trống'}
+        </button>
+      `;
+      sanRow.appendChild(cell);
+    });
+    row.appendChild(sanRow);
+    grid.appendChild(row);
+  });
+}
+
+// ── Render Booking Grid ───────────────────────────────────────
+function renderBookingGrid() {
+  const grid = document.getElementById('bookingTimeGrid');
+  grid.innerHTML = '';
+  if (!state.giaSan.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-text">Chưa có dữ liệu</div></div>';
+    return;
+  }
+  // Chỉ hiển thị tóm tắt
+  state.giaSan.forEach(g => {
+    const lichRow = state.lichSan.find(l => l.khungGio === g.khungGio) || {};
+    const soCaDat = [lichRow.s1_tien,lichRow.s2_tien,lichRow.s3_tien,lichRow.s4_tien,lichRow.s5_tien]
+      .filter(v => Number(v)>0).length;
+    const isPeak = g.isVang;
+    const row = document.createElement('div');
+    row.className = 'time-row' + (isPeak ? ' peak' : '');
+    row.innerHTML = `
+      <div class="time-head${isPeak?' peak':''}">
+        <span class="time-label">${g.khungGio.replace('★','').trim()}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${isPeak ? '<span class="time-badge">★ Vàng</span>' : ''}
+          <span style="font-size:12px;font-weight:700;color:${soCaDat>0?'var(--g2)':'var(--mid)'}">
+            ${soCaDat}/5 đặt
+          </span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(row);
+  });
+}
+
+// ── Render Report ─────────────────────────────────────────────
+function renderReport() {
+  const t = state.baoCao.tong || {};
+  const rows = state.baoCao.rows || [];
+
+  document.getElementById('rp-dt').textContent = fmtK(t.tongThucThu || 0);
+  document.getElementById('rp-tm').textContent = fmtK(t.tongTM || 0);
+  document.getElementById('rp-ck').textContent = fmtK(t.tongCK || 0);
+
+  // Detail
+  const detail = document.getElementById('reportDetail');
+  if (!rows.length) {
+    detail.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Chưa có báo cáo ca hôm nay</div></div>';
+  } else {
+    detail.innerHTML = rows.map(r => `
+      <div class="report-row">
+        <div>
+          <div style="font-weight:700;font-size:13px">${r.ca} — ${r.nv||'?'}</div>
+          <div style="font-size:11px;color:var(--mid)">${r.ghiChu||''}</div>
+        </div>
+        <div class="report-val green">${fmtMoney(r.thucThu)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Khach hang
+  const khList = document.getElementById('khachHangList');
+  if (!state.khachHang.length) {
+    khList.innerHTML = '<div class="empty"><div class="empty-text">Chưa có khách hàng</div></div>';
+  } else {
+    khList.innerHTML = state.khachHang.slice(0,8).map(k => {
+      const initials = (k.tenKH||'?').substring(0,2).toUpperCase();
+      const badgeClass = k.loai === 'VIP' ? 'badge-vip' : k.loai === 'Cố định' ? 'badge-cd' : 'badge-th';
+      return `
+        <div class="kh-item">
+          <div class="kh-avatar">${initials}</div>
+          <div class="kh-info">
+            <div class="kh-name">${k.tenKH}</div>
+            <div class="kh-meta">${k.sdt||''} ${k.gioHayDat ? '· '+k.gioHayDat : ''}</div>
+          </div>
+          <span class="kh-badge ${badgeClass}">${k.loai||'Thường'}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Doi chieu
+  const tongCa = t.tongThucThu || 0;
+  document.getElementById('dc-tongca').textContent = fmtMoney(tongCa);
+}
+
+// ── Submit Booking ────────────────────────────────────────────
+async function submitBooking() {
+  const khung  = document.getElementById('bk-khung').value;
+  const san    = document.getElementById('bk-san').value;
+  const kh     = document.getElementById('bk-kh').value.trim();
+  const tien   = Number(document.getElementById('bk-tien').value) || 0;
+  const loai   = document.getElementById('bk-loai').value;
+  const nv     = document.getElementById('bk-nv').value.trim();
+  const ghichu = document.getElementById('bk-ghichu').value.trim();
+
+  if (!khung) { showToast('Chọn khung giờ trước', 'error'); return; }
+  if (!kh)    { showToast('Nhập tên khách / đội', 'error'); return; }
+
+  // Save NV name
+  if (nv) { localStorage.setItem('nv_name', nv); state.nv = nv; }
+
+  const btn = document.getElementById('bk-submit');
+  btn.disabled = true; btn.textContent = 'Đang lưu...';
+
+  try {
+    const res = await apiPost({
+      action: 'ghiDatSan',
+      data: { ngay: state.today, nv, khungGio: khung, sanSo: san, tenKH: kh, tienThu: tien, loai, ghiChu: ghichu }
+    });
+    if (res.ok) {
+      showToast('✓ Đã đặt sân: ' + kh, 'success');
+      // Reset form
+      document.getElementById('bk-kh').value = '';
+      document.getElementById('bk-tien').value = '';
+      document.getElementById('bk-ghichu').value = '';
+      loadAll();
+    } else {
+      showToast(res.error || 'Lỗi, thử lại', 'error');
+    }
+  } catch(e) {
+    showToast('Mất kết nối', 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Xác nhận đặt sân';
+}
+
+// ── Quick book from grid ──────────────────────────────────────
+function quickBook(khung, san, khHienTai, gia) {
+  if (khHienTai && khHienTai !== 'Có thể đặt') {
+    showToast('Sân ' + san + ' đã có: ' + khHienTai, 'error');
+    return;
+  }
+  showScreen('booking');
+  document.getElementById('bk-khung').value = khung;
+  document.getElementById('bk-san').value = san;
+  document.getElementById('bk-tien').value = gia;
+  document.getElementById('bk-giaTK').textContent = fmtMoney(gia);
+  document.getElementById('bk-kh').focus();
+}
+
+// ── Submit Payment ────────────────────────────────────────────
+async function submitPayment() {
+  const ca     = document.getElementById('py-ca').value;
+  const nv     = document.getElementById('py-nv').value.trim();
+  const tm     = Number(document.getElementById('py-tm').value) || 0;
+  const ck     = Number(document.getElementById('py-ck').value) || 0;
+  const coc    = Number(document.getElementById('py-coc').value) || 0;
+  const hoan   = Number(document.getElementById('py-hoan').value) || 0;
+  const ghichu = document.getElementById('py-ghichu').value.trim();
+
+  if (!nv) { showToast('Nhập tên NV trực', 'error'); return; }
+  if (tm + ck + coc === 0) { showToast('Nhập số tiền thu', 'error'); return; }
+
+  if (nv) { localStorage.setItem('nv_name', nv); state.nv = nv; }
+
+  const now = new Date();
+  const days = ['CN','T2','T3','T4','T5','T6','T7'];
+  const thu = days[now.getDay()];
+
+  const btn = document.getElementById('py-submit');
+  btn.disabled = true; btn.textContent = 'Đang gửi...';
+
+  try {
+    const res = await apiPost({
+      action: 'ghiThuTien',
+      data: { ngay: state.today, thu, nv, ca, tienMat: tm, ck, coc, hoan, ghiChu: ghichu }
+    });
+    if (res.ok) {
+      showToast('✓ ' + res.message, 'success');
+      document.getElementById('py-tm').value = '';
+      document.getElementById('py-ck').value = '';
+      document.getElementById('py-coc').value = '';
+      document.getElementById('py-hoan').value = '';
+      document.getElementById('py-ghichu').value = '';
+      calcTotal();
+      loadAll();
+    } else {
+      showToast(res.error || 'Lỗi, thử lại', 'error');
+    }
+  } catch(e) {
+    showToast('Mất kết nối', 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Gửi báo cáo ca';
+}
+
+// ── Add KH ────────────────────────────────────────────────────
+function openAddKH() { document.getElementById('modalKH').classList.add('open'); }
+
+async function submitKH() {
+  const ten   = document.getElementById('m-ten').value.trim();
+  const sdt   = document.getElementById('m-sdt').value.trim();
+  const gio   = document.getElementById('m-gio').value.trim();
+  const loai  = document.getElementById('m-loai').value;
+  const ghichu= document.getElementById('m-ghichu').value.trim();
+
+  if (!ten) { showToast('Nhập tên khách hàng', 'error'); return; }
+
+  try {
+    const res = await apiPost({
+      action: 'ghiKhachHang',
+      data: { tenKH: ten, sdt, gioHayDat: gio, loai, ghiChu: ghichu }
+    });
+    if (res.ok) {
+      showToast('✓ Đã thêm: ' + ten, 'success');
+      closeModal('modalKH');
+      loadAll();
+    } else {
+      showToast(res.error || 'Lỗi', 'error');
+    }
+  } catch(e) {
+    showToast('Mất kết nối', 'error');
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'report') renderReport();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function calcTotal() {
+  const tm   = Number(document.getElementById('py-tm').value)  || 0;
+  const ck   = Number(document.getElementById('py-ck').value)  || 0;
+  const coc  = Number(document.getElementById('py-coc').value) || 0;
+  const hoan = Number(document.getElementById('py-hoan').value)|| 0;
+  const total = tm + ck + coc - hoan;
+  document.getElementById('py-total').textContent = fmtMoney(total) + ' đ';
+}
+
+function calcDoiChieu() {
+  const tongCa = (state.baoCao.tong||{}).tongThucThu || 0;
+  const bank   = Number(document.getElementById('dc-bank').value) || 0;
+  const chenh  = bank - tongCa;
+  const el     = document.getElementById('dc-chenh');
+  const st     = document.getElementById('dc-status');
+  el.textContent = fmtMoney(Math.abs(chenh)) + (chenh >= 0 ? '' : ' thiếu');
+  el.className   = 'report-val ' + (chenh === 0 ? 'green' : 'red');
+  st.textContent = chenh === 0 ? '✅ Khớp hoàn toàn' : (chenh > 0 ? '⚠ Bank dư ' + fmtMoney(chenh) : '🚨 Chênh lệch ' + fmtMoney(-chenh));
+  st.style.color = chenh === 0 ? 'var(--g2)' : 'var(--r)';
+}
+
+function adjustMoney(delta) {
+  const inp = document.getElementById('bk-tien');
+  inp.value = Math.max(0, (Number(inp.value)||0) + delta);
+}
+
+function fmtMoney(n) {
+  if (!n) return '0';
+  return Math.round(n).toLocaleString('vi-VN');
+}
+
+function fmtK(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+  if (n >= 1000)    return (n/1000).toFixed(0) + 'K';
+  return String(Math.round(n));
+}
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function setStatus(s) {
+  const bar = document.getElementById('statusBar');
+  const txt = document.getElementById('statusTxt');
+  const time = document.getElementById('statusTime');
+  const now = new Date();
+  time.textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  if (s === 'ok') {
+    bar.className = 'status-bar';
+    txt.textContent = '● Kết nối tốt · Sân Đại Nam';
+  } else if (s === 'error') {
+    bar.className = 'status-bar offline';
+    txt.textContent = '● Mất kết nối — kiểm tra mạng';
+  } else {
+    bar.className = 'status-bar';
+    bar.style.background = '#64748b';
+    txt.textContent = '● Đang tải...';
+  }
+}
+
+// Close modal khi tap outside
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Auto-refresh mỗi 5 phút
+setInterval(loadAll, 300000);
+</script>
+</body>
+</html>
